@@ -1,0 +1,519 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "manual_dialog.h"
+#include "about_dialog.h"
+
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QScrollBar>
+#include <QHeaderView>
+#include <QRegExp>
+
+#include <fstream>
+#include <sstream>
+#include <string>
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    setupConnections();
+    setupTables();
+
+    ui->algorithmComboBox->setCurrentIndex(0);
+    onAlgorithmChanged(0);
+}
+
+MainWindow::~MainWindow() {
+    delete ui;
+}
+
+// ---------------------------------------------------------
+// Conexões e tabelas
+// ---------------------------------------------------------
+
+void MainWindow::setupConnections() {
+    connect(ui->addProcessPushButton, &QPushButton::clicked, this, &MainWindow::onAddProcess);
+    connect(ui->removeProcessPushButton, &QPushButton::clicked, this, &MainWindow::onRemoveSelected);
+    connect(ui->startPushButton, &QPushButton::clicked, this, &MainWindow::onStartScheduling);
+    connect(ui->limparPushButton, &QPushButton::clicked, this, &MainWindow::onClearAll);
+    connect(ui->algorithmComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onAlgorithmChanged);
+
+    connect(ui->actionImportar, &QAction::triggered, this, &MainWindow::onLoadCSV);
+    connect(ui->actionExportar, &QAction::triggered, this, &MainWindow::onSaveCSV);
+    connect(ui->actionManual, &QAction::triggered, this, &MainWindow::showManual);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::showAbout);
+
+    connect(ui->actionPortugues, &QAction::triggered, this, [=](){loadLanguage("pt");});
+    connect(ui->actionIngles, &QAction::triggered, this, [=](){loadLanguage("en");});
+
+}
+
+void MainWindow::setupTables() {
+    ui->processesTable->setColumnCount(4);
+    ui->processesTable->setHorizontalHeaderLabels({tr("Nome"), tr("Chegada"), tr("Execução"), tr("Prioridade")});
+    ui->processesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->processesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->processesTable->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    ui->resultsTable->setColumnCount(5);
+    ui->resultsTable->setHorizontalHeaderLabels({tr("PID"), tr("Início"), tr("Término"), tr("Espera"), tr("Turnaround")});
+    ui->resultsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    ui->diagramTable->setRowCount(2);
+    ui->diagramTable->setVerticalHeaderLabels({tr("Tempo"), tr("Processo")});
+    ui->diagramTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->diagramTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+// ---------------------------------------------------------
+// Mudar algoritmo (Priority / RR)
+// ---------------------------------------------------------
+
+void MainWindow::onAlgorithmChanged(int index) {
+    Q_UNUSED(index);
+    showAlgorithmSpecificFields();
+}
+
+void MainWindow::showAlgorithmSpecificFields() {
+    QString alg = ui->algorithmComboBox->currentText().trimmed();
+
+    bool isPriority = (alg == "Priority");
+    bool isRR = (alg == "Round Robin");
+
+    ui->priorityLabel->setVisible(false);
+    ui->prioritySpinBox->setVisible(false);
+    ui->prioritySpinBox->setEnabled(false);
+
+    ui->quantumLabel->setVisible(false);
+    ui->quantumSpinBox->setVisible(false);
+    ui->quantumSpinBox->setEnabled(false);
+
+    if (ui->algorithmStackedWidget) {
+        ui->algorithmStackedWidget->setVisible(false);
+    }
+
+    ui->processesTable->setColumnHidden(3, true);
+
+    if (isPriority) {
+        ui->priorityLabel->setVisible(true);
+        ui->prioritySpinBox->setVisible(true);
+        ui->prioritySpinBox->setEnabled(true);
+
+        if (ui->algorithmStackedWidget) {
+            ui->algorithmStackedWidget->setCurrentIndex(0);
+            ui->algorithmStackedWidget->setVisible(true);
+        }
+
+        ui->processesTable->setColumnHidden(3, false);
+    }
+    else if (isRR) {
+        ui->quantumLabel->setVisible(true);
+        ui->quantumSpinBox->setVisible(true);
+        ui->quantumSpinBox->setEnabled(true);
+
+        if (ui->algorithmStackedWidget) {
+            ui->algorithmStackedWidget->setCurrentIndex(1);
+            ui->algorithmStackedWidget->setVisible(true);
+        }
+
+        ui->processesTable->setColumnHidden(3, true);
+    }
+    else {
+        ui->processesTable->setColumnHidden(3, true);
+    }
+
+    ui->diagramTable->setVisible(true);
+}
+
+
+// ---------------------------------------------------------
+// Ler processos da interface
+// ---------------------------------------------------------
+
+std::vector<Process> MainWindow::readProcessesFromUI() const {
+    std::vector<Process> list;
+    int rows = ui->processesTable->rowCount();
+
+    for (int i = 0; i < rows; ++i) {
+        auto *nameItem = ui->processesTable->item(i, 0);
+        auto *arrItem = ui->processesTable->item(i, 1);
+        auto *burstItem = ui->processesTable->item(i, 2);
+        auto *prioItem = ui->processesTable->item(i, 3);
+
+        if (!nameItem || !arrItem || !burstItem) continue;
+
+        list.emplace_back(
+            nameItem->text().toStdString(),
+            arrItem->text().toInt(),
+            burstItem->text().toInt(),
+            prioItem ? prioItem->text().toInt() : 0
+        );
+    }
+
+    return list;
+}
+
+// ---------------------------------------------------------
+// Atualizar tabela
+// ---------------------------------------------------------
+
+void MainWindow::refreshProcessTable() {
+    const auto &procs = controller.processes();
+
+    ui->processesTable->blockSignals(true);
+    ui->processesTable->setRowCount(procs.size());
+
+    for (int i = 0; i < static_cast<int>(procs.size()); ++i) {
+        const auto &p = procs[i];
+
+        ui->processesTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(p.name())));
+        ui->processesTable->setItem(i, 1, new QTableWidgetItem(QString::number(p.arrival())));
+        ui->processesTable->setItem(i, 2, new QTableWidgetItem(QString::number(p.burst())));
+        ui->processesTable->setItem(i, 3, new QTableWidgetItem(QString::number(p.priority())));
+    }
+
+    ui->processesTable->blockSignals(false);
+}
+
+// ---------------------------------------------------------
+// Botões (Add / Remove / Start / Clear)
+// ---------------------------------------------------------
+
+void MainWindow::onAddProcess() {
+    QString name = ui->processNameInput->text();
+    int arrival = ui->arrivalTimeInput->value();
+    int burst = ui->executionTimeInput->value();
+    int prio = ui->prioritySpinBox->value();
+
+    if (name.trimmed().isEmpty()) {
+        QMessageBox::warning(this, tr("Erro"), tr("O nome do processo não pode ser vazio."));
+        return;
+    }
+
+    auto procs = controller.processes();
+    for (const auto &p : procs) {
+        if (p.name() == name.toStdString()) {
+            QMessageBox::warning(this, tr("Erro"), tr("Já existe um processo com esse nome."));
+            return;
+        }
+    }
+
+    procs.emplace_back(name.toStdString(), arrival, burst, prio);
+    controller.setProcesses(procs);
+    refreshProcessTable();
+
+    ui->processNameInput->clear();
+    ui->arrivalTimeInput->setValue(0);
+    ui->executionTimeInput->setValue(1);
+    ui->prioritySpinBox->setValue(1);
+}
+
+void MainWindow::onRemoveSelected() {
+    auto sel = ui->processesTable->selectionModel()->selectedRows();
+    if (sel.empty()) {
+        QMessageBox::information(this, tr("Remover"), tr("Selecione um processo para remover."));
+        return;
+    }
+
+    int row = sel.first().row();
+    auto procs = controller.processes();
+
+    if (row >= 0 && row < static_cast<int>(procs.size())) {
+        procs.erase(procs.begin() + row);
+        controller.setProcesses(procs);
+        refreshProcessTable();
+    }
+}
+
+void MainWindow::onStartScheduling() {
+    auto procs = readProcessesFromUI();
+    if (procs.empty()) {
+        QMessageBox::warning(this, tr("Iniciar"), tr("Adicione pelo menos um processo."));
+        return;
+    }
+
+    QString algText = ui->algorithmComboBox->currentText().trimmed();
+        if (algText.isEmpty()) {
+            QMessageBox::warning(this, tr("Erro"), tr("Selecione um algoritmo antes de iniciar."));
+            return;
+     }
+
+    controller.setProcesses(procs);
+
+    std::string alg = ui->algorithmComboBox->currentText().toStdString();
+    int quantum = ui->quantumSpinBox->value();
+
+    ScheduleOutcome o = controller.runAlgorithm(alg, quantum);
+
+    fillResultsTable(o);
+    buildTimeline(o);
+}
+
+void MainWindow::onClearAll() {
+    controller.setProcesses({});
+    ui->processesTable->setRowCount(0);
+    ui->diagramTable->setColumnCount(0);
+    ui->diagramTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->resultsTable->setRowCount(0);
+}
+
+// ---------------------------------------------------------
+// Resultados
+// ---------------------------------------------------------
+
+void MainWindow::fillResultsTable(const ScheduleOutcome &o) {
+    ui->resultsTable->blockSignals(true);
+    ui->resultsTable->setRowCount(o.results.size());
+
+    for (int i = 0; i < static_cast<int>(o.results.size()); ++i) {
+        const auto &r = o.results[i];
+
+        ui->resultsTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(r.name)));
+        ui->resultsTable->setItem(i, 1, new QTableWidgetItem(QString::number(r.startTime)));
+        ui->resultsTable->setItem(i, 2, new QTableWidgetItem(QString::number(r.finishTime)));
+        ui->resultsTable->setItem(i, 3, new QTableWidgetItem(QString::number(r.waitingTime)));
+        ui->resultsTable->setItem(i, 4, new QTableWidgetItem(QString::number(r.turnaroundTime)));
+
+    }
+
+    ui->resultsTable->blockSignals(false);
+}
+
+// ---------------------------------------------------------
+// Timeline
+// ---------------------------------------------------------
+
+void MainWindow::buildTimeline(const ScheduleOutcome &o) {
+    ui->diagramTable->blockSignals(true);
+    ui->diagramTable->clearContents();
+
+    int n = o.timeline.size();
+    ui->diagramTable->setRowCount(2);
+    ui->diagramTable->setColumnCount(n);
+
+    ui->diagramTable->verticalHeader()->setVisible(true);
+    ui->diagramTable->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->diagramTable->verticalHeader()->setDefaultSectionSize(40);
+
+    for (int i = 0; i < n; ++i) {
+        ui->diagramTable->setItem(0, i, new QTableWidgetItem(QString::number(o.timeline[i].time)));
+        ui->diagramTable->setItem(1, i, new QTableWidgetItem(QString::fromStdString(o.timeline[i].running)));
+        ui->diagramTable->setColumnWidth(i, 40);
+    }
+
+    ui->diagramTable->horizontalHeader()->setVisible(false);
+    ui->diagramTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->diagramTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    ui->diagramTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    int totalHeight = ui->diagramTable->horizontalHeader()->height();
+    for (int r = 0; r < 2; ++r)
+        totalHeight += ui->diagramTable->rowHeight(r);
+
+    totalHeight += (ui->diagramTable->horizontalScrollBar()->maximum() > 0)
+                   ? ui->diagramTable->horizontalScrollBar()->height() : 0;
+
+    ui->diagramTable->setMinimumHeight(totalHeight);
+    ui->diagramTable->setMaximumHeight(totalHeight);
+    ui->diagramTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    ui->diagramTable->setVisible(true);
+    ui->diagramTable->blockSignals(false);
+}
+
+// ---------------------------------------------------------
+// Salvar CSV
+// ---------------------------------------------------------
+
+void MainWindow::onSaveCSV() {
+    QString path = QFileDialog::getSaveFileName(
+        this,
+        tr("Salvar Arquivo"),
+        "",
+        tr("Text Files (*.txt *.csv)")
+    );
+
+    if (path.isEmpty()) return;
+
+    std::ofstream out(path.toStdString());
+    if (!out.is_open()) return;
+
+    QString alg = ui->algorithmComboBox->currentText();
+    int quantum = ui->quantumSpinBox->value();
+    out << "#PARAMS\n";
+    out << alg.toStdString() << "," << quantum << "\n\n";
+
+    out << "#PROCESSES\n";
+    out << "Name,Arrival,Burst,Priority\n";
+    int rows = ui->processesTable->rowCount();
+    for (int i = 0; i < rows; ++i) {
+        QString name = ui->processesTable->item(i, 0)->text();
+        QString arrival = ui->processesTable->item(i, 1)->text();
+        QString burst = ui->processesTable->item(i, 2)->text();
+        QString prio = ui->processesTable->item(i, 3)->text();
+        out << name.toStdString() << ","
+            << arrival.toStdString() << ","
+            << burst.toStdString() << ","
+            << prio.toStdString() << "\n";
+    }
+    out << "\n";
+
+    out << "#RESULTS\n";
+    out << "PID,Start,Finish,Waiting,Turnaround\n";
+    int resRows = ui->resultsTable->rowCount();
+    for (int i = 0; i < resRows; ++i) {
+        out << ui->resultsTable->item(i, 0)->text().toStdString() << ","
+            << ui->resultsTable->item(i, 1)->text().toStdString() << ","
+            << ui->resultsTable->item(i, 2)->text().toStdString() << ","
+            << ui->resultsTable->item(i, 3)->text().toStdString() << ","
+            << ui->resultsTable->item(i, 4)->text().toStdString() << "\n";
+    }
+
+    out.close();
+}
+
+// ---------------------------------------------------------
+// Carregar CSV
+// ---------------------------------------------------------
+
+void MainWindow::onLoadCSV() {
+    QString path = QFileDialog::getOpenFileName(
+        this,
+        tr("Carregar Arquivo"),
+        "",
+        tr("Text Files (*.txt *.csv)")
+    );
+
+    if (path.isEmpty()) return;
+
+    std::ifstream in(path.toStdString());
+    if (!in.is_open()) return;
+
+    enum Section { NONE, PARAMS, PROCESSES, RESULTS };
+    Section sec = NONE;
+
+    std::vector<Process> processes;
+    std::vector<ProcessResult> results;
+
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+
+        if (line.find("#PARAMS") != std::string::npos) { sec = PARAMS; continue; }
+        if (line.find("#PROCESSES") != std::string::npos) { sec = PROCESSES; continue; }
+        if (line.find("#RESULTS") != std::string::npos) { sec = RESULTS; continue; }
+
+        std::stringstream ss(line);
+        std::string token;
+
+        if (sec == PARAMS) {
+            size_t pos = line.rfind(',');
+            if (pos == std::string::npos) continue;
+
+            std::string algStr = line.substr(0, pos);
+            std::string quantumStr = line.substr(pos + 1);
+
+            QString alg = QString::fromStdString(algStr).trimmed();
+
+            int quantum = 0;
+            try { quantum = std::stoi(quantumStr); } catch (...) { quantum = 0; }
+
+            int index = ui->algorithmComboBox->findText(alg);
+            if (index >= 0) ui->algorithmComboBox->setCurrentIndex(index);
+            ui->quantumSpinBox->setValue(quantum);
+        }
+        else if (sec == PROCESSES) {
+            if (line.find("Name") != std::string::npos) continue;
+
+            Process p;
+            std::getline(ss, token, ','); p.setName(token);
+            std::getline(ss, token, ','); p.setArrival(std::stoi(token));
+            std::getline(ss, token, ','); p.setBurst(std::stoi(token));
+            std::getline(ss, token, ','); p.setPriority(std::stoi(token));
+            processes.push_back(p);
+        }
+        else if (sec == RESULTS) {
+            if (line.find("PID") != std::string::npos) continue;
+
+            ProcessResult r;
+            std::getline(ss, token, ','); r.name = token;
+            std::getline(ss, token, ','); r.startTime = std::stoi(token);
+            std::getline(ss, token, ','); r.finishTime = std::stoi(token);
+            std::getline(ss, token, ','); r.waitingTime = std::stoi(token);
+            std::getline(ss, token, ','); r.turnaroundTime = std::stoi(token);
+            results.push_back(r);
+        }
+    }
+
+    in.close();
+
+    ui->processesTable->setRowCount(processes.size());
+    for (int i = 0; i < (int)processes.size(); ++i) {
+        ui->processesTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(processes[i].name())));
+        ui->processesTable->setItem(i, 1, new QTableWidgetItem(QString::number(processes[i].arrival())));
+        ui->processesTable->setItem(i, 2, new QTableWidgetItem(QString::number(processes[i].burst())));
+        ui->processesTable->setItem(i, 3, new QTableWidgetItem(QString::number(processes[i].priority())));
+    }
+
+    ui->resultsTable->setRowCount(results.size());
+    for (int i = 0; i < (int)results.size(); ++i) {
+        ui->resultsTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(results[i].name)));
+        ui->resultsTable->setItem(i, 1, new QTableWidgetItem(QString::number(results[i].startTime)));
+        ui->resultsTable->setItem(i, 2, new QTableWidgetItem(QString::number(results[i].finishTime)));
+        ui->resultsTable->setItem(i, 3, new QTableWidgetItem(QString::number(results[i].waitingTime)));
+        ui->resultsTable->setItem(i, 4, new QTableWidgetItem(QString::number(results[i].turnaroundTime)));
+    }
+}
+
+// ---------------------------------------------------------
+// Menus Ajuda e Manual do Usuário
+// ---------------------------------------------------------
+
+void MainWindow::showManual()
+{
+    ManualDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::showAbout()
+{
+    AboutDialog dialog(this);
+    dialog.exec();
+}
+
+// ---------------------------------------------------------
+// Tradução
+// ---------------------------------------------------------
+
+void MainWindow::loadLanguage(const QString &langCode)
+{
+    qApp->removeTranslator(&translator);
+
+    if (langCode == "en") {
+        if (translator.load(":/translations/app_en.qm")) {
+            qApp->installTranslator(&translator);
+        }
+    }
+    else if (langCode == "pt") {
+        if (translator.load(":/translations/app_pt.qm")) {
+            qApp->installTranslator(&translator);
+        }
+    }
+
+    ui->processesTable->setHorizontalHeaderLabels(
+        { tr("Nome"), tr("Chegada"), tr("Execução"), tr("Prioridade") }
+    );
+
+    ui->resultsTable->setHorizontalHeaderLabels(
+        { tr("PID"), tr("Início"), tr("Término"), tr("Espera"), tr("Turnaround") }
+    );
+
+    ui->diagramTable->setVerticalHeaderLabels(
+        { tr("Tempo"), tr("Processo") }
+    );
+
+    ui->retranslateUi(this);
+}

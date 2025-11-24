@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ManualDialog</class>
+ <widget class="QDialog" name="ManualDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>700</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <weight>50</weight>
+    <bold>false</bold>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Manual do Usuário</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QLabel" name="labelManual">
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Manual do Usuário</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QDialogButtonBox" name="buttonBoxManual">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QScrollArea" name="scrollAreaManual">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>-918</y>
+        <width>661</width>
+        <height>1425</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="labelVisao">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>1. Visão geral</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelVisaoDesc">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Este manual descreve o funcionamento geral do simulador de escalonamento de processos, incluindo as etapas de inserção de processos, escolha dos algoritmos, execução e análise dos resultados. &lt;/p&gt;&lt;hr/&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelProcessos">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>2. Cadastrando Processos</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelProcessosDesc">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Para inserir um processo, preencha os campos: &lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nome&lt;/span&gt; - Identificador único do processo. &lt;/li&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tempo de Chegada&lt;/span&gt; - Momento em que o processo entra na fila. &lt;/li&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tempo de Execução (Burst)&lt;/span&gt; - Quantidade total de tempo necessária para execução. &lt;/li&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Prioridad&lt;/span&gt;e - Apenas para o algoritmo Priority. &lt;/li&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Fatia de tempo (quantum) &lt;/span&gt;- Apenas para o algoritmo Round Robin. &lt;/li&gt;&lt;/ul&gt;&lt;p align=&quot;justify&quot;&gt;Após preencher, clique em &lt;span style=&quot; font-weight:600;&quot;&gt;Adicionar&lt;/span&gt;. O processo aparecerá na tabela. &lt;/p&gt;&lt;hr/&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelAlgoritmo">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>3. Selecionando o Algoritmo</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelAlgoritmoDesc">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;No topo da interface, escolha o algoritmo desejado. Caso selecione Round Robin, informe também o valor do &lt;span style=&quot; font-weight:600;&quot;&gt;quantum&lt;/span&gt;. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;Abaixo é possível visualizar uma lista dos algoritmos implementados, bem como uma breve descrição de cada um:&lt;/p&gt;
+&lt;ul style=&quot;margin-left: 0px; padding-left: 16px;&quot;&gt;
+
+    &lt;li align=&quot;justify&quot; style=&quot;margin-bottom:6px;&quot;&gt;
+        &lt;span style=&quot;font-weight:600;&quot;&gt;FCFS (First Come, First Served)&lt;/span&gt;&lt;br/&gt;
+        Os processos são executados na &lt;span style=&quot;font-weight:600;&quot;&gt;ordem em que chegam&lt;/span&gt; ao sistema. 
+        Não há preempção e cada processo roda até terminar.
+    &lt;/li&gt;
+
+    &lt;li align=&quot;justify&quot; style=&quot;margin-bottom:6px;&quot;&gt;
+        &lt;span style=&quot;font-weight:600;&quot;&gt;SJF (Shortest Job First)&lt;/span&gt;&lt;br/&gt;
+        Escolhe sempre o processo com o &lt;span style=&quot;font-weight:600;&quot;&gt;menor tempo de execução&lt;/span&gt; (burst). 
+        Não é preemptivo: após iniciar um processo, ele roda até o fim.
+    &lt;/li&gt;
+
+    &lt;li align=&quot;justify&quot; style=&quot;margin-bottom:6px;&quot;&gt;
+        &lt;span style=&quot;font-weight:600;&quot;&gt;SRTF (Shortest Remaining Time First)&lt;/span&gt;&lt;br/&gt;
+        Versão preemptiva do SJF. A cada unidade de tempo, escolhe o processo com o 
+        &lt;span style=&quot;font-weight:600;&quot;&gt;menor tempo restante&lt;/span&gt;.
+    &lt;/li&gt;
+
+    &lt;li align=&quot;justify&quot; style=&quot;margin-bottom:6px;&quot;&gt;
+        &lt;span style=&quot;font-weight:600;&quot;&gt;Priority&lt;/span&gt;&lt;br/&gt;
+        Escolhe o processo com &lt;span style=&quot;font-weight:600;&quot;&gt;maior prioridade&lt;/span&gt; (menor valor numérico). 
+        Não é preemptivo. Em caso de empate, o processo que chegou primeiro executa antes.
+    &lt;/li&gt;
+
+    &lt;li align=&quot;justify&quot; style=&quot;margin-bottom:6px;&quot;&gt;
+        &lt;span style=&quot;font-weight:600;&quot;&gt;Round Robin&lt;/span&gt;&lt;br/&gt;
+        Cada processo recebe uma &lt;span style=&quot;font-weight:600;&quot;&gt;fatia fixa de tempo&lt;/span&gt; (quantum). 
+        Quando o quantum expira, o processo retorna ao fim da fila. É preemptivo.
+    &lt;/li&gt;
+
+&lt;/ul&gt;
+
+&lt;hr/&gt;
+&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelExecucao">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>4. Executando o Escalonamento</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelExecucaoDesc">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Após inserir os processos, clique em &lt;span style=&quot; font-weight:600;&quot;&gt;Iniciar&lt;/span&gt;. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;O sistema executará o algoritmo selecionado e exibirá: &lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tabela de Resultados&lt;/span&gt; - com tempos de início, fim, espera e turnaround. &lt;/li&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Diagrama de Execução&lt;/span&gt; - mostrando qual processo executou em cada unidade de tempo. &lt;/li&gt;&lt;/ul&gt;&lt;hr/&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelArquivos">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>5. Importar e Exportar Arquivos</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelArquivosDesc">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;Você pode salvar ou carregar conjuntos de processos e resultados usando arquivos CSV/TXT: &lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Importar&lt;/span&gt; - Carrega processos de um arquivo. &lt;/li&gt;&lt;li align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Exportar&lt;/span&gt; - Salva processos e resultados em um arquivo. &lt;/li&gt;&lt;/ul&gt;&lt;p align=&quot;justify&quot;&gt;Os arquivos incluem parâmetros como o algoritmo e o quantum. &lt;/p&gt;&lt;hr/&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLimpar">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>6. Limpar Dados</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLimparDesc">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;O botão &lt;span style=&quot; font-weight:600;&quot;&gt;Limpar&lt;/span&gt; remove todos os processos e resultados da tela, permitindo iniciar uma nova simulação. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBoxManual</sender>
+   <signal>accepted()</signal>
+   <receiver>ManualDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBoxManual</sender>
+   <signal>rejected()</signal>
+   <receiver>ManualDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
