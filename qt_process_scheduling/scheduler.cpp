@@ -135,58 +135,78 @@ ScheduleOutcome Scheduler::rr(const std::vector<Process>& procs, int quantum) co
     int n = (int)queue.size();
     std::vector<int> rem(n);
     std::vector<int> start(n, -1);
-    std::vector<int> finish(n, -1);
-    for (int i=0;i<n;++i) rem[i] = queue[i].burst();
+    std::vector<int> arrival_time(n);
+    std::vector<bool> inReadyQueue(n, false);
+    for (int i = 0; i < n; ++i) {
+        rem[i] = queue[i].burst();
+        arrival_time[i] = queue[i].arrival();
+    }
 
+    std::vector<std::pair<int, int>> sorted_arrivals(n);
+    for (int i = 0; i < n; ++i) sorted_arrivals[i] = {arrival_time[i], i};
+    std::sort(sorted_arrivals.begin(), sorted_arrivals.end());
+    int arrival_ptr = 0;
+
+    std::queue<int> readyQ;
     int time = 0;
-    std::queue<int> q;
-    std::vector<bool> inQueue(n, false);
-    int completed = 0;
+    int completed_count = 0;
 
-    auto enqueueArrived = [&](int currentTime){
-        for (int i=0;i<n;++i) {
-            if (!inQueue[i] && rem[i] > 0 && queue[i].arrival() <= currentTime) {
-                q.push(i);
-                inQueue[i] = true;
+    while (completed_count < n) {
+        while (arrival_ptr < n && sorted_arrivals[arrival_ptr].first <= time) {
+            int i = sorted_arrivals[arrival_ptr].second;
+            if (!inReadyQueue[i] && rem[i] > 0) {
+                readyQ.push(i);
+                inReadyQueue[i] = true;
             }
+            ++arrival_ptr;
         }
-    };
 
-    enqueueArrived(time);
-
-    while (completed < n) {
-        if (q.empty()) {
+        if (readyQ.empty()) {
             int nextArrival = std::numeric_limits<int>::max();
-            for (int i=0;i<n;++i) if (rem[i] > 0) nextArrival = std::min(nextArrival, queue[i].arrival());
-            if (nextArrival == std::numeric_limits<int>::max()) break;
-            ensure_timeline(out.timeline, nextArrival+1);
+            if (arrival_ptr < n) {
+                nextArrival = sorted_arrivals[arrival_ptr].first;
+            } else {
+                break;
+            }
+
+            ensure_timeline(out.timeline, nextArrival);
             time = nextArrival;
-            enqueueArrived(time);
             continue;
         }
 
-        int i = q.front(); q.pop(); inQueue[i] = false;
+        int i = readyQ.front(); readyQ.pop(); inReadyQueue[i] = false;
+
         if (start[i] == -1) start[i] = time;
 
-        int slice = std::min(quantum, rem[i]);
-        for (int s = 0; s < slice; ++s) {
-            ensure_timeline(out.timeline, time+1);
-            out.timeline[time].running = queue[i].name();
-            ++time;
+        int execution_slice = std::min(quantum, rem[i]);
+        int finish_time_slice = time + execution_slice;
+
+        for (int t = time; t < finish_time_slice; ++t) {
+            ensure_timeline(out.timeline, t + 1);
+            out.timeline[t].running = queue[i].name();
+            --rem[i];
+
+            while (arrival_ptr < n && sorted_arrivals[arrival_ptr].first <= t + 1) {
+                int j = sorted_arrivals[arrival_ptr].second;
+                if (!inReadyQueue[j] && rem[j] > 0) {
+                    readyQ.push(j);
+                    inReadyQueue[j] = true;
+                }
+                ++arrival_ptr;
+            }
         }
-        rem[i] -= slice;
 
-        enqueueArrived(time);
+        time = finish_time_slice;
 
-        if (rem[i] == 0) {
-            finish[i] = time;
-            ++completed;
-            int turnaround = finish[i] - queue[i].arrival();
-            int waiting = turnaround - queue[i].burst();
-            out.results.push_back({queue[i].name(), start[i], finish[i], waiting, turnaround});
+        if (rem[i] > 0) {
+            readyQ.push(i);
+            inReadyQueue[i] = true;
         } else {
-            q.push(i);
-            inQueue[i] = true;
+            int turnaround = time - queue[i].arrival();
+            int waiting = turnaround - queue[i].burst();
+
+            out.results.push_back({queue[i].name(), start[i], time, waiting, turnaround});
+            ++completed_count;
         }
     }
 
