@@ -37,6 +37,8 @@ private:
     QTranslator translator;
 
     SchedulingController controller;
+    ScheduleOutcome lastOutcome;
+
     StorageManager storage;
 
     void refreshProcessTable();

@@ -23,267 +23,283 @@
         <translation>Process Scheduler</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="51"/>
+        <location filename="../mainwindow.ui" line="61"/>
         <source>Algoritmo: </source>
         <translation>Algorithm: </translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="76"/>
+        <location filename="../mainwindow.ui" line="86"/>
         <source>First Come, First Served</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="81"/>
+        <location filename="../mainwindow.ui" line="91"/>
         <source>Shortest Job First</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="86"/>
+        <location filename="../mainwindow.ui" line="96"/>
         <source>Shortest Remaining Time First</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="91"/>
+        <location filename="../mainwindow.ui" line="101"/>
         <source>Round Robin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="96"/>
+        <location filename="../mainwindow.ui" line="106"/>
         <source>Priority</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="110"/>
+        <location filename="../mainwindow.ui" line="120"/>
         <source>Nome do processo: </source>
         <translation>Process name: </translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="139"/>
+        <location filename="../mainwindow.ui" line="149"/>
         <source>Tempo de chegada:</source>
         <translation>Arrival time:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="194"/>
         <source>Tempo de execução:  </source>
-        <translation type="unfinished">Execution time:           </translation>
+        <translation type="obsolete">Execution time:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="315"/>
+        <location filename="../mainwindow.ui" line="204"/>
+        <source>Tempo de execução:          </source>
+        <translation type="unfinished">Execution time:          </translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="325"/>
         <source>Prioridade:</source>
         <translation>Priority:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="384"/>
+        <location filename="../mainwindow.ui" line="394"/>
         <source>Fatia de tempo:</source>
-        <translation type="unfinished">Quantum:</translation>
+        <translation>Quantum:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="443"/>
+        <location filename="../mainwindow.ui" line="453"/>
         <source>Adicionar</source>
         <translation>Add</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="450"/>
-        <location filename="../mainwindow.cpp" line="216"/>
+        <location filename="../mainwindow.ui" line="460"/>
+        <location filename="../mainwindow.cpp" line="218"/>
         <source>Remover</source>
         <translation>Remove</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="487"/>
-        <location filename="../mainwindow.cpp" line="233"/>
+        <location filename="../mainwindow.ui" line="498"/>
+        <location filename="../mainwindow.cpp" line="235"/>
         <source>Iniciar</source>
         <translation>Start</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="549"/>
-        <location filename="../mainwindow.cpp" line="65"/>
-        <location filename="../mainwindow.cpp" line="509"/>
+        <location filename="../mainwindow.ui" line="592"/>
+        <location filename="../mainwindow.cpp" line="67"/>
+        <location filename="../mainwindow.cpp" line="461"/>
         <source>Tempo</source>
         <translation>Time</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="554"/>
-        <location filename="../mainwindow.cpp" line="65"/>
-        <location filename="../mainwindow.cpp" line="509"/>
+        <location filename="../mainwindow.ui" line="597"/>
+        <location filename="../mainwindow.cpp" line="67"/>
+        <location filename="../mainwindow.cpp" line="461"/>
         <source>Processo</source>
         <translation>Process</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="564"/>
+        <location filename="../mainwindow.ui" line="623"/>
         <source>Limpar</source>
         <translation>Clear</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="573"/>
+        <location filename="../mainwindow.ui" line="632"/>
         <source>toolBar</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="593"/>
+        <location filename="../mainwindow.ui" line="652"/>
         <source>&amp;Arquivo</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="602"/>
+        <location filename="../mainwindow.ui" line="661"/>
         <source>A&amp;juda</source>
         <translation>&amp;Help</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="609"/>
+        <location filename="../mainwindow.ui" line="668"/>
         <source>&amp;Idioma</source>
         <translation>&amp;Language</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="624"/>
+        <location filename="../mainwindow.ui" line="683"/>
         <source>Importar...</source>
         <translation>Import...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="627"/>
+        <location filename="../mainwindow.ui" line="686"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="636"/>
+        <location filename="../mainwindow.ui" line="695"/>
         <source>Exportar...</source>
         <translation>Export...</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="639"/>
+        <location filename="../mainwindow.ui" line="698"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="648"/>
+        <location filename="../mainwindow.ui" line="707"/>
         <source>Sair</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="651"/>
+        <location filename="../mainwindow.ui" line="710"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="660"/>
+        <location filename="../mainwindow.ui" line="719"/>
         <source>Sobre</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="669"/>
+        <location filename="../mainwindow.ui" line="728"/>
         <source>Manual do usuário</source>
         <translation type="unfinished">User manual</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="674"/>
+        <location filename="../mainwindow.ui" line="733"/>
         <source>Português (pt-BR)</source>
         <translation>Portuguese (pt-BR)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="679"/>
+        <location filename="../mainwindow.ui" line="738"/>
         <source>Inglês (en-US)</source>
         <translation>English (en-US)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="55"/>
-        <location filename="../mainwindow.cpp" line="501"/>
+        <location filename="../mainwindow.cpp" line="57"/>
+        <location filename="../mainwindow.cpp" line="453"/>
         <source>Nome</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="55"/>
-        <location filename="../mainwindow.cpp" line="501"/>
+        <location filename="../mainwindow.cpp" line="57"/>
+        <location filename="../mainwindow.cpp" line="453"/>
         <source>Chegada</source>
         <translation>Arrival</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="55"/>
-        <location filename="../mainwindow.cpp" line="501"/>
+        <location filename="../mainwindow.cpp" line="57"/>
+        <location filename="../mainwindow.cpp" line="453"/>
         <source>Execução</source>
         <translation>Execution</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="55"/>
-        <location filename="../mainwindow.cpp" line="501"/>
+        <location filename="../mainwindow.cpp" line="57"/>
+        <location filename="../mainwindow.cpp" line="453"/>
         <source>Prioridade</source>
         <translation>Priority</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="61"/>
-        <location filename="../mainwindow.cpp" line="505"/>
+        <location filename="../mainwindow.cpp" line="63"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>PID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="61"/>
-        <location filename="../mainwindow.cpp" line="505"/>
+        <location filename="../mainwindow.cpp" line="63"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Início</source>
         <translation>Start</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="61"/>
-        <location filename="../mainwindow.cpp" line="505"/>
+        <location filename="../mainwindow.cpp" line="63"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Término</source>
         <translation>Finish</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="61"/>
-        <location filename="../mainwindow.cpp" line="505"/>
+        <location filename="../mainwindow.cpp" line="63"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Espera</source>
         <translation>Waiting</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="61"/>
-        <location filename="../mainwindow.cpp" line="505"/>
+        <location filename="../mainwindow.cpp" line="63"/>
+        <location filename="../mainwindow.cpp" line="457"/>
         <source>Turnaround</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="191"/>
-        <location filename="../mainwindow.cpp" line="198"/>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="193"/>
+        <location filename="../mainwindow.cpp" line="200"/>
+        <location filename="../mainwindow.cpp" line="241"/>
+        <location filename="../mainwindow.cpp" line="366"/>
+        <location filename="../mainwindow.cpp" line="390"/>
         <source>Erro</source>
         <translation>Error</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="191"/>
+        <location filename="../mainwindow.cpp" line="193"/>
         <source>O nome do processo não pode ser vazio.</source>
         <translation>The process name cannot be empty.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="198"/>
+        <location filename="../mainwindow.cpp" line="200"/>
         <source>Já existe um processo com esse nome.</source>
         <translation>A process with this name already exists.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="216"/>
+        <location filename="../mainwindow.cpp" line="218"/>
         <source>Selecione um processo para remover.</source>
         <translation>Select a process to remove.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="233"/>
+        <location filename="../mainwindow.cpp" line="235"/>
         <source>Adicione pelo menos um processo.</source>
         <translation>Add at least one process.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="239"/>
+        <location filename="../mainwindow.cpp" line="241"/>
         <source>Selecione um algoritmo antes de iniciar.</source>
         <translation>Select an algorithm before starting.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="334"/>
+        <location filename="../mainwindow.cpp" line="339"/>
         <source>Salvar Arquivo</source>
         <translation>Save File</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="336"/>
-        <location filename="../mainwindow.cpp" line="388"/>
+        <location filename="../mainwindow.cpp" line="341"/>
+        <location filename="../mainwindow.cpp" line="379"/>
         <source>Text Files (*.txt *.csv)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="386"/>
+        <location filename="../mainwindow.cpp" line="366"/>
+        <source>Falha ao salvar o arquivo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="377"/>
         <source>Carregar Arquivo</source>
         <translation>Load File</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="390"/>
+        <source>Falha ao carregar o arquivo.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

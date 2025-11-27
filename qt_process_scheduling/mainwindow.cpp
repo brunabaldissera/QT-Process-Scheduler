@@ -2,12 +2,13 @@
 #include "ui_mainwindow.h"
 #include "manual_dialog.h"
 #include "about_dialog.h"
+#include "storage_manager.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QScrollBar>
 #include <QHeaderView>
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <fstream>
 #include <sstream>
@@ -248,6 +249,10 @@ void MainWindow::onStartScheduling() {
 
     ScheduleOutcome o = controller.runAlgorithm(alg, quantum);
 
+    AlgorithmParameters params;
+    params.algorithmName = ui->algorithmComboBox->currentText().toStdString();
+    params.quantum = ui->quantumSpinBox->value();
+
     fillResultsTable(o);
     buildTimeline(o);
 }
@@ -338,41 +343,28 @@ void MainWindow::onSaveCSV() {
 
     if (path.isEmpty()) return;
 
-    std::ofstream out(path.toStdString());
-    if (!out.is_open()) return;
+    StorageManager manager;
+    AlgorithmParameters params;
+    params.algorithmName = ui->algorithmComboBox->currentText().toStdString();
+    params.quantum = ui->quantumSpinBox->value();
 
-    QString alg = ui->algorithmComboBox->currentText();
-    int quantum = ui->quantumSpinBox->value();
-    out << "#PARAMS\n";
-    out << alg.toStdString() << "," << quantum << "\n\n";
+    std::vector<Process> processes = readProcessesFromUI();
 
-    out << "#PROCESSES\n";
-    out << "Name,Arrival,Burst,Priority\n";
-    int rows = ui->processesTable->rowCount();
-    for (int i = 0; i < rows; ++i) {
-        QString name = ui->processesTable->item(i, 0)->text();
-        QString arrival = ui->processesTable->item(i, 1)->text();
-        QString burst = ui->processesTable->item(i, 2)->text();
-        QString prio = ui->processesTable->item(i, 3)->text();
-        out << name.toStdString() << ","
-            << arrival.toStdString() << ","
-            << burst.toStdString() << ","
-            << prio.toStdString() << "\n";
-    }
-    out << "\n";
-
-    out << "#RESULTS\n";
-    out << "PID,Start,Finish,Waiting,Turnaround\n";
+    std::vector<ProcessResult> results;
     int resRows = ui->resultsTable->rowCount();
     for (int i = 0; i < resRows; ++i) {
-        out << ui->resultsTable->item(i, 0)->text().toStdString() << ","
-            << ui->resultsTable->item(i, 1)->text().toStdString() << ","
-            << ui->resultsTable->item(i, 2)->text().toStdString() << ","
-            << ui->resultsTable->item(i, 3)->text().toStdString() << ","
-            << ui->resultsTable->item(i, 4)->text().toStdString() << "\n";
+        ProcessResult r;
+        r.name = ui->resultsTable->item(i, 0)->text().toStdString();
+        r.startTime = ui->resultsTable->item(i, 1)->text().toInt();
+        r.finishTime = ui->resultsTable->item(i, 2)->text().toInt();
+        r.waitingTime = ui->resultsTable->item(i, 3)->text().toInt();
+        r.turnaroundTime = ui->resultsTable->item(i, 4)->text().toInt();
+        results.push_back(r);
     }
 
-    out.close();
+    if (!manager.saveProject(processes, params, results, path.toStdString())) {
+        QMessageBox::warning(this, tr("Erro"), tr("Falha ao salvar o arquivo."));
+    }
 }
 
 // ---------------------------------------------------------
@@ -389,69 +381,23 @@ void MainWindow::onLoadCSV() {
 
     if (path.isEmpty()) return;
 
-    std::ifstream in(path.toStdString());
-    if (!in.is_open()) return;
-
-    enum Section { NONE, PARAMS, PROCESSES, RESULTS };
-    Section sec = NONE;
-
+    StorageManager manager;
+    AlgorithmParameters params;
     std::vector<Process> processes;
     std::vector<ProcessResult> results;
 
-    std::string line;
-    while (std::getline(in, line)) {
-        if (line.empty()) continue;
-
-        if (line.find("#PARAMS") != std::string::npos) { sec = PARAMS; continue; }
-        if (line.find("#PROCESSES") != std::string::npos) { sec = PROCESSES; continue; }
-        if (line.find("#RESULTS") != std::string::npos) { sec = RESULTS; continue; }
-
-        std::stringstream ss(line);
-        std::string token;
-
-        if (sec == PARAMS) {
-            size_t pos = line.rfind(',');
-            if (pos == std::string::npos) continue;
-
-            std::string algStr = line.substr(0, pos);
-            std::string quantumStr = line.substr(pos + 1);
-
-            QString alg = QString::fromStdString(algStr).trimmed();
-
-            int quantum = 0;
-            try { quantum = std::stoi(quantumStr); } catch (...) { quantum = 0; }
-
-            int index = ui->algorithmComboBox->findText(alg);
-            if (index >= 0) ui->algorithmComboBox->setCurrentIndex(index);
-            ui->quantumSpinBox->setValue(quantum);
-        }
-        else if (sec == PROCESSES) {
-            if (line.find("Name") != std::string::npos) continue;
-
-            Process p;
-            std::getline(ss, token, ','); p.setName(token);
-            std::getline(ss, token, ','); p.setArrival(std::stoi(token));
-            std::getline(ss, token, ','); p.setBurst(std::stoi(token));
-            std::getline(ss, token, ','); p.setPriority(std::stoi(token));
-            processes.push_back(p);
-        }
-        else if (sec == RESULTS) {
-            if (line.find("PID") != std::string::npos) continue;
-
-            ProcessResult r;
-            std::getline(ss, token, ','); r.name = token;
-            std::getline(ss, token, ','); r.startTime = std::stoi(token);
-            std::getline(ss, token, ','); r.finishTime = std::stoi(token);
-            std::getline(ss, token, ','); r.waitingTime = std::stoi(token);
-            std::getline(ss, token, ','); r.turnaroundTime = std::stoi(token);
-            results.push_back(r);
-        }
+    if (!manager.loadProject(processes, params, results, path.toStdString())) {
+        QMessageBox::warning(this, tr("Erro"), tr("Falha ao carregar o arquivo."));
+        return;
     }
 
-    in.close();
+    // Atualiza a interface
+    int algIndex = ui->algorithmComboBox->findText(QString::fromStdString(params.algorithmName));
+    if (algIndex >= 0) ui->algorithmComboBox->setCurrentIndex(algIndex);
+    ui->quantumSpinBox->setValue(params.quantum);
 
     ui->processesTable->setRowCount(processes.size());
-    for (int i = 0; i < (int)processes.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(processes.size()); ++i) {
         ui->processesTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(processes[i].name())));
         ui->processesTable->setItem(i, 1, new QTableWidgetItem(QString::number(processes[i].arrival())));
         ui->processesTable->setItem(i, 2, new QTableWidgetItem(QString::number(processes[i].burst())));
@@ -459,7 +405,7 @@ void MainWindow::onLoadCSV() {
     }
 
     ui->resultsTable->setRowCount(results.size());
-    for (int i = 0; i < (int)results.size(); ++i) {
+    for (int i = 0; i < static_cast<int>(results.size()); ++i) {
         ui->resultsTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(results[i].name)));
         ui->resultsTable->setItem(i, 1, new QTableWidgetItem(QString::number(results[i].startTime)));
         ui->resultsTable->setItem(i, 2, new QTableWidgetItem(QString::number(results[i].finishTime)));
